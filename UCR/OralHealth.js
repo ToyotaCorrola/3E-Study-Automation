@@ -9,7 +9,7 @@ function oralHealth() {
   // D: School Email (index 3)
   // Oral Health headers:
   // A: StudyID (index 0)
-  // F: Name/Email (index 5: "[Full Name], [School Email Address]")
+  // F: Email (index 5: "[School Email Address]")
 
   const EMAIL_COL_MASTER = 3; // Column D (0-based)
   const STUDYID_COL_MASTER = 0; // Column A (0-based)
@@ -23,16 +23,6 @@ function oralHealth() {
     4: {sheet: masterSpreadsheet.getSheetByName('W4'), oralColumn: 13, healthCompletedIdx: 10},
     5: {sheet: masterSpreadsheet.getSheetByName('W5'), oralColumn: 13, healthCompletedIdx: 10}
   };
-
-  // Helper: parse "[Full Name], email@school.edu" -> "email@school.edu"
-  function extractEmail(nameEmailCell) {
-    if (!nameEmailCell) return '';
-    const parts = String(nameEmailCell).split(',');
-    if (parts.length < 2) return '';
-    const email = parts[1].trim();
-    // Very light validation
-    return email && email.indexOf('@') > 0 ? email.toLowerCase() : '';
-  }
 
   // Preload data and create maps for efficient lookup (by StudyID and by Email)
   const masterDataMaps = {};
@@ -83,7 +73,7 @@ function oralHealth() {
 
     // 2) Fallback by Email (parsed from Oral Health "Name/Email" col F)
     if (!participant) {
-      const emailFromOral = extractEmail(row[NAME_EMAIL_COL_ORAL]);
+      const emailFromOral = row[NAME_EMAIL_COL_ORAL];
       if (emailFromOral) {
         participant = masterSheetData.mapByEmail[emailFromOral] || null;
       }
