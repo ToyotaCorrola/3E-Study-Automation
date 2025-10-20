@@ -1,7 +1,8 @@
 function transferHealthVisitData(){
+  let scriptProperties = PropertiesService.getScriptProperties();
   // Master Sheet and Linking Destination details.
-  var masterSheetId             = '1rLIUGPVviSjAP9P9PwvjDVWyEwfyUxkH3kgN0sn7xkI';  
-  var linkingDestinationSheetId = '1yH-ONuCHMKes9zizJ6_UFjo8e5LIdpjfoUYU0usxkw8';
+  var masterSheetId             = scriptProperties.getProperty("MasterSheetKEY");  
+  var linkingDestinationSheetId = scriptProperties.getProperty("HealthVisitKEY");
   
   var masterSS = SpreadsheetApp.openById(masterSheetId);
   var sheetNames = {1: 'W1', 2: 'W2', 3: 'W3', 4: 'W4', 5: 'W5'};

@@ -1,7 +1,9 @@
 function transferWave1SurveyData() {
-  var masterSheetId               = '1dpipHcJxL950rW5tyf9pqw29R3qaYX0xUP5ZSBeH51o';
+  let scriptProperties = PropertiesService.getScriptProperties();
+  // Master Sheet and Linking Destination details.
+  var masterSheetId               = scriptProperties.getProperty("MasterSheetKEY"); 
+  var linkingDestinationSheetId   = scriptProperties.getProperty("Wave1Key");
   var w1SheetName                 = 'W1';
-  var linkingDestinationSheetId   = '1UtYtR_odhw5WNq4om4-aD8Q64sQlDdstQn5PK2rL6mg';
   var linkingDestinationSheetName = 'Sheet1';
   
   var masterSS = SpreadsheetApp.openById(masterSheetId);
@@ -14,12 +16,76 @@ function transferWave1SurveyData() {
   var masterBg = masterRange.getBackgrounds();
   var destData = destSheet.getDataRange().getValues();
   
+
+  var schoolEmailMap = {};
+  var personalEmailMap = {};
+  var duplicateStudyIds = [];
+
+  for (var j = 1; j < masterData.length; j++) {
+    var mRow = masterData[j];
+    var studyId = mRow[0];
+    var schoolEmail = mRow[3]; 
+    var personalEmail = mRow[4]; 
+    
+    // Check School Email duplicates
+    if (studyId && schoolEmail && schoolEmail.toString().trim() !== "") {
+      var emailLower = schoolEmail.toString().toLowerCase().trim();
+      
+      if (schoolEmailMap[emailLower]) {
+        // Found a duplicate! This is NOT the first occurrence
+        // var firstStudyId = schoolEmailMap[emailLower].studyId;
+        // var firstRowNum = schoolEmailMap[emailLower].row;
+
+        
+        // Mark ONLY this duplicate YELLOW (not the first one)
+        masterBg[j][0] = "yellow";  // Changed to yellow
+        duplicateStudyIds.push(studyId);
+        //Logger.log("MARKED ROW " + (j + 1) + " YELLOW - StudyID: " + studyId);
+      } else {
+        // First time seeing this email - store it
+        schoolEmailMap[emailLower] = {
+          studyId: studyId,
+          row: j + 1
+        };
+      }
+    }
+
+    // Check Personal Email duplicates
+    if (studyId && personalEmail && personalEmail.toString().trim() !== "") {
+      var emailLower = personalEmail.toString().toLowerCase().trim();
+      
+      if (personalEmailMap[emailLower]) {
+        // var firstStudyId = personalEmailMap[emailLower].studyId;
+        var firstRowNum = personalEmailMap[emailLower].row;
+        // 
+        
+        masterBg[j][0] = "yellow";
+        if (duplicateStudyIds.indexOf(studyId) === -1) {
+          duplicateStudyIds.push(studyId);
+        }
+      } else {
+        personalEmailMap[emailLower] = {
+          studyId: studyId,
+          row: j + 1
+        };
+      }
+    }
+  }
+
+  // Logger.log("\nSUMMARY:");
+  // Logger.log("Total unique UCR emails: " + Object.keys(schoolEmailMap).length);
+  // Logger.log("Total unique personal emails: " + Object.keys(personalEmailMap).length);
+  // Logger.log("Study IDs marked as duplicates: " + duplicateStudyIds.join(", "));
+  // Logger.log("Total duplicates marked: " + duplicateStudyIds.length);
+    
   // Build destination map keyed by Study ID from column A.
   var destMap = {};
   for (var i = 1; i < destData.length; i++) {
     var row = destData[i];
     if (row[0]) destMap[row[0]] = row;
   }
+  
+
   var surveyCompletedIdx          = 8;
   var healthScheduledIdx          = 11;
   var healthCompletedIdx          = 12;

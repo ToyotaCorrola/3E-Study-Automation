@@ -1,7 +1,9 @@
 function transferWave2SurveyData() {
-  var masterSheetId               = '1dpipHcJxL950rW5tyf9pqw29R3qaYX0xUP5ZSBeH51o';
+  let scriptProperties = PropertiesService.getScriptProperties();
+  // Master Sheet and Linking Destination details.
+  var masterSheetId               = scriptProperties.getProperty("MasterSheetKEY"); 
+  var linkingDestinationSheetId   = scriptProperties.getProperty("Wave2Key");
   var w2SheetName                 = 'W2';
-  var linkingDestinationSheetId   = '1qP39lL0qr9V7H8R8pbpYbvn6FaL0v9edLFsfY3dJh5g';
   var linkingDestinationSheetName = 'Sheet1';
   
   var masterSS = SpreadsheetApp.openById(masterSheetId);
@@ -25,6 +27,7 @@ function transferWave2SurveyData() {
   var healthCompletedIdx          = 10;
   var preferredContactMethodIdx   = 17;
   var notesIdx                    = 18;
+  var enrolledInSubStudyIdx       = 14;
   for (var j = 1; j < masterData.length; j++) {
     var mRow = masterData[j],
         studyId = mRow[0];
@@ -63,6 +66,10 @@ function transferWave2SurveyData() {
         //By Default, the "Health Visit Scheduled" column is set to value "NO" IF AND ONLY IF (IFF) the "Survey Completed" column is set to "YES"
         mRow[healthScheduledIdx] = "NO"; 
         masterBg[j][healthScheduledIdx] = "red"; 
+
+        //By Default, the "Interested in Substudy" column is set to value "NO" IF AND ONLY IF (IFF) the "Survey Completed" column is set to "YES"
+        //mRow[enrolledInSubStudyIdx] = "NO"; 
+        //masterBg[j][enrolledInSubStudyIdx] = "red"; 
       }
 
       //HEALTH VISIT DATE

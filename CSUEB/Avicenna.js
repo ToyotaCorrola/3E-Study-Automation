@@ -1,9 +1,11 @@
 function updateSubstudyEnrollment() {
-  const avicennaFileId   = "1HwUFMNkQHDypZ5Uz0eL-XWPwTymRQUMNZqW1JnB7SW4";
-  const linkingKeyFileId = "1dpipHcJxL950rW5tyf9pqw29R3qaYX0xUP5ZSBeH51o";
+  let scriptProperties = PropertiesService.getScriptProperties();
+  // Master Sheet and Linking Destination details.
+  const masterSheetId = scriptProperties.getProperty("MasterSheetKEY");;
+  const avicennaFileId = scriptProperties.getProperty("AvicennaKEY");
 
   const avicennaFile = SpreadsheetApp.openById(avicennaFileId);
-  const linkingKeyFile = SpreadsheetApp.openById(linkingKeyFileId);
+  const linkingKeyFile = SpreadsheetApp.openById(masterSheetId);
 
   processSheet("W1", "W1", "R", "S", avicennaFile, linkingKeyFile);
   processSheet("W2", "W2", "P", "Q", avicennaFile, linkingKeyFile);
