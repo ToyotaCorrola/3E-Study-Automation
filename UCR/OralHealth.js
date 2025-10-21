@@ -1,6 +1,11 @@
 function oralHealth() {
-  const masterSpreadsheet     = SpreadsheetApp.openById('1rLIUGPVviSjAP9P9PwvjDVWyEwfyUxkH3kgN0sn7xkI');
-  const oralHealthSpreadsheet = SpreadsheetApp.openById("15V8qIngFs9RUmHObGs-Lw7RTfW7Fu7AzE5cVs4PZGaY");
+  let scriptProperties = PropertiesService.getScriptProperties();
+  // Master Sheet and Linking Destination details.
+  var masterSheetId             = scriptProperties.getProperty("MasterSheetKEY"); 
+  var linkingDestinationSheetId = scriptProperties.getProperty("OralHealthKEY");
+
+  const masterSpreadsheet     = SpreadsheetApp.openById(masterSheetId);
+  const oralHealthSpreadsheet = SpreadsheetApp.openById(linkingDestinationSheetId);
   const oralHealthSheet = oralHealthSpreadsheet.getSheetByName("Sheet1");
   const oralHealthData = oralHealthSheet.getDataRange().getValues();
 

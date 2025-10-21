@@ -1,6 +1,7 @@
 function transferDataToMasterSheet() {
-  // Master Sheet details
-  var masterSheetId = '1rLIUGPVviSjAP9P9PwvjDVWyEwfyUxkH3kgN0sn7xkI';
+  let scriptProperties = PropertiesService.getScriptProperties();
+  // Master Sheet details.
+  const masterSheetId = scriptProperties.getProperty("MasterSheetKEY");;
   
   // Define configuration for each master sheet.
   // Note: updateMap maps field names to the 1-indexed column to update.
@@ -41,10 +42,18 @@ function transferDataToMasterSheet() {
   
   // Data sources (you may leave these as-is)
   var sources = [
-    { fileId: '1g-oZlmePRbiV2wPqyGg3hMK_U52Zr8LnnPhuF7aZfrc', sheetName: 'Email', source: 'EMAIL' },
-    { fileId: '1AuYhkLbs20qNlAIgUrA5l8VdtkagF_SDQ3CPiDpZBXQ', sheetName: 'Sheet1', source: 'IG/WEB' },
-    { fileId: '1m7rSbMsboRvng5JQmiKKDkeXLkFzDQZopTtpJfT0Ogo', sheetName: 'Sheet1', source: 'REFERRAL' },
-    { fileId: '1Rkb7e1p_7qKt3Og4J5pPosyNQ--twG-yvk0PUgbuS_8', sheetName: 'Sheet1', source: 'FLYER' }
+    { fileId: scriptProperties.getProperty("ScreeningAndConsent-Email-KEY"), 
+      sheetName: 'Email', 
+      source: 'EMAIL' },
+    { fileId: scriptProperties.getProperty("ScreeningAndConsent-IGWEB-KEY"),  
+      sheetName: 'Sheet1', 
+      source: 'IG/WEB' },
+    { fileId: scriptProperties.getProperty("ScreeningAndConsent-REFERRAL-KEY"), 
+      sheetName: 'Sheet1', 
+      source: 'REFERRAL' },
+    { fileId: scriptProperties.getProperty("ScreeningAndConsent-FLYER-KEY"), 
+      sheetName: 'Sheet1', 
+      source: 'FLYER' }
   ];
   
   // Process each source file

@@ -1,7 +1,9 @@
 function transferWave3SurveyData() {
-  var masterSheetId                = '1rLIUGPVviSjAP9P9PwvjDVWyEwfyUxkH3kgN0sn7xkI';
+  let scriptProperties = PropertiesService.getScriptProperties();
+  // Master Sheet and Linking Destination details.
+  var masterSheetId                 = scriptProperties.getProperty("MasterSheetKEY"); 
+  var linkingDestinationSheetId    = scriptProperties.getProperty("Wave3Key");
   var w3SheetName                  = 'W3';
-  var linkingDestinationSheetId    = '1-1ny5kVqSfS-GruvC9Ov8jySz_3rTcKcsJnLvdimOpo';
   var linkingDestinationSheetName  = 'Sheet1';
   
   var masterSS = SpreadsheetApp.openById(masterSheetId);

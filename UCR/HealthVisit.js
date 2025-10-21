@@ -1,7 +1,8 @@
 function transferHealthVisitData(){
+  let scriptProperties = PropertiesService.getScriptProperties();
   // Master Sheet and Linking Destination details.
-  var masterSheetId             = '1rLIUGPVviSjAP9P9PwvjDVWyEwfyUxkH3kgN0sn7xkI';  
-  var linkingDestinationSheetId = '1yH-ONuCHMKes9zizJ6_UFjo8e5LIdpjfoUYU0usxkw8';
+  var masterSheetId             = scriptProperties.getProperty("MasterSheetKEY");  
+  var linkingDestinationSheetId = scriptProperties.getProperty("HealthVisitKEY");
   
   var masterSS = SpreadsheetApp.openById(masterSheetId);
   var sheetNames = {1: 'W1', 2: 'W2', 3: 'W3', 4: 'W4', 5: 'W5'};
@@ -10,15 +11,6 @@ function transferHealthVisitData(){
   // Master headers: A: StudyID (0), D: School Email (3)
   var STUDYID_COL_MASTER = 0;
   var EMAIL_COL_MASTER   = 3;
-
-  // Helper: parse "[Full Name], email@school.edu" -> "email@school.edu"
-  function extractEmail(nameEmailCell) {
-    if (!nameEmailCell) return '';
-    var parts = String(nameEmailCell).split(',');
-    if (parts.length < 2) return '';
-    var email = parts[1].trim();
-    return (email && email.indexOf('@') > 0) ? email.toLowerCase() : '';
-  }
   
   // Preload each master sheet’s data, backgrounds, and build mappings by StudyID and by Email.
   for (var w = 1; w <= 5; w++) {
@@ -74,13 +66,12 @@ function transferHealthVisitData(){
     var studyId = studyIdRaw != null ? String(studyIdRaw).trim() : '';
     if (studyId.length >= 1) {
       idx = master.mapByStudyId[studyId];
-      if(idx == undefined) console.log(firstName + " " + studyId)
+      //if(idx == undefined) console.log(firstName + " " + studyId)
     }
     if (studyId.length === 0) {
-      var emailFromLinking = extractEmail(nameEmail);
-      console.log("" + firstName);
-      if (emailFromLinking) {
-        idx = master.mapByEmail[emailFromLinking];
+      if (nameEmail) {
+        idx = master.mapByEmail[nameEmail];
+        console.log(master.data[idx] + " " + visitMonth + " " + visitYear);
       }
     }
     if (idx === undefined) 
@@ -152,8 +143,14 @@ function transferHealthVisitData(){
       if (mRow[1].toString().toLowerCase() !== String(firstName).toLowerCase()) {
         appendToNotes(mRow, indexes.notesIdx, "Different first name in health visit");
       }
-      if (!mRow[indexes.healthMonthIdx]) { mRow[indexes.healthMonthIdx] = visitMonth; master.bg[idx][indexes.healthMonthIdx] = "red"; }
-      if (!mRow[indexes.healthYearIdx])  { mRow[indexes.healthYearIdx]  = visitYear;  master.bg[idx][indexes.healthYearIdx]  = "red"; }
+      if (!mRow[indexes.healthMonthIdx]) { 
+        mRow[indexes.healthMonthIdx] = visitMonth; 
+        master.bg[idx][indexes.healthMonthIdx] = "red"; 
+      }
+      if (!mRow[indexes.healthYearIdx])  { 
+        mRow[indexes.healthYearIdx]  = visitYear;  
+        master.bg[idx][indexes.healthYearIdx]  = "red"; 
+      }
     }
     else if (wNum === 5) {
       const indexes = {
@@ -168,7 +165,10 @@ function transferHealthVisitData(){
       if (mRow[1].toString().toLowerCase() !== String(firstName).toLowerCase()) {
         appendToNotes(mRow, indexes.notesIdx, "Different first name in health visit");
       }
-      if (!mRow[indexes.healthMonthIdx]) { mRow[indexes.healthMonthIdx] = visitMonth; master.bg[idx][indexes.healthMonthIdx] = "red"; }
+      if (!mRow[indexes.healthMonthIdx]) { 
+        mRow[indexes.healthMonthIdx] = visitMonth; 
+        master.bg[idx][indexes.healthMonthIdx] = "red"; 
+      }
       if (!mRow[indexes.healthYearIdx])  { mRow[indexes.healthYearIdx]  = visitYear;  master.bg[idx][indexes.healthYearIdx]  = "red"; }
     }
   }

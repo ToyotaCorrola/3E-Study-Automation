@@ -1,7 +1,9 @@
 function transferWave4SurveyData() {
-  var masterSheetId               = '1rLIUGPVviSjAP9P9PwvjDVWyEwfyUxkH3kgN0sn7xkI';
+  let scriptProperties = PropertiesService.getScriptProperties();
+  // Master Sheet and Linking Destination details.
+  var masterSheetId               = scriptProperties.getProperty("MasterSheetKEY"); 
+  var linkingDestinationSheetId   = scriptProperties.getProperty("Wave4Key");
   var w4SheetName                 = 'W4';
-  var linkingDestinationSheetId   = '1rwFyG56U6Nt9uPsEs2CoI4sALYg1Tms3QQxM1J7Fvgw';
   var linkingDestinationSheetName = 'Sheet1';
   
   var masterSS = SpreadsheetApp.openById(masterSheetId);

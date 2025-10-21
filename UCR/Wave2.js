@@ -1,7 +1,9 @@
 function transferWave2SurveyData() {
-  var masterSheetId               = '1rLIUGPVviSjAP9P9PwvjDVWyEwfyUxkH3kgN0sn7xkI';
+  let scriptProperties = PropertiesService.getScriptProperties();
+  // Master Sheet and Linking Destination details.
+  var masterSheetId               = scriptProperties.getProperty("MasterSheetKEY"); 
+  var linkingDestinationSheetId   = scriptProperties.getProperty("Wave2Key");
   var w2SheetName                 = 'W2';
-  var linkingDestinationSheetId   = '1g6AWr-tJ-TLeii7-9NteJCDQ-qwjNEYaZbC1w72adl4';
   var linkingDestinationSheetName = 'Sheet1';
   
   var masterSS = SpreadsheetApp.openById(masterSheetId);
