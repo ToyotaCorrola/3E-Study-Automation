@@ -29,14 +29,6 @@ function oralHealth() {
     5: {sheet: masterSpreadsheet.getSheetByName('W5'), oralColumn: 13, healthCompletedIdx: 10}
   };
 
-  // Helper: parse "[Full Name], email@school.edu" -> "email@school.edu"
-  function extractEmail(nameEmailCell) {
-    if (!nameEmailCell) return '';
-    const parts = String(nameEmailCell).split(',');
-    if (parts.length < 2) return '';
-    const email = parts[1].trim();
-    return email && email.indexOf('@') > 0 ? email.toLowerCase() : '';
-  }
 
   // Preload data and create maps for efficient lookup (by StudyID and by Email)
   const masterDataMaps = {};
@@ -82,9 +74,9 @@ function oralHealth() {
 
     // 2) Fallback to email match (from Oral Health F)
     if (!participant) {
-      const email = extractEmail(row[NAMEEMAIL_COL_ORAL]);
-      if (email) {
-        participant = masterSheetData.mapByEmail[email] || null;
+      const emailFromOral = row[NAME_EMAIL_COL_ORAL];
+      if (emailFromOral) {
+        participant = masterSheetData.mapByEmail[emailFromOral] || null;
       }
     }
 

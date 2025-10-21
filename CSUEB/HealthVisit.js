@@ -12,15 +12,6 @@ function transferHealthVisitData(){
   var STUDYID_COL_MASTER = 0;
   var EMAIL_COL_MASTER   = 3;
 
-  // Helper: parse "[Full Name], email@school.edu" -> "email@school.edu"
-  function extractEmail(nameEmailCell) {
-    if (!nameEmailCell) return '';
-    var parts = String(nameEmailCell).split(',');
-    if (parts.length < 2) return '';
-    var email = parts[1].trim();
-    return (email && email.indexOf('@') > 0) ? email.toLowerCase() : '';
-  }
-  
   // Preload each master sheet’s data, backgrounds, and build map by StudyID and by Email.
   for (var w = 1; w <= 5; w++) {
     var sheet   = masterSS.getSheetByName(sheetNames[w]);
@@ -81,8 +72,10 @@ function transferHealthVisitData(){
       if(idx == undefined) console.log(firstName + " " + studyId)
     }
     if (studyId.length === 0) {
-      var emailFromLinking = extractEmail(nameEmail);
-      if (emailFromLinking) idx = master.mapByEmail[emailFromLinking];
+      if (nameEmail) {
+        idx = master.mapByEmail[nameEmail];
+        console.log(master.data[idx] + " " + visitMonth + " " + visitYear);
+      }
     }
     if (idx === undefined) continue; // no match found
 
