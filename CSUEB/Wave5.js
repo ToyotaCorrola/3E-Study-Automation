@@ -1,8 +1,8 @@
 function transferWave5SurveyData() {
- let scriptProperties = PropertiesService.getScriptProperties();
+  let scriptProperties = PropertiesService.getScriptProperties();
   // Master Sheet and Linking Destination details.
   var masterSheetId               = scriptProperties.getProperty("MasterSheetKEY"); 
-  var linkingDestinationSheetId   = scriptProperties.getProperty("Wave4Key");
+  var linkingDestinationSheetId   = scriptProperties.getProperty("Wave5Key");
   var w5SheetName                 = 'W5';
   var linkingDestinationSheetName = 'Sheet1';
   

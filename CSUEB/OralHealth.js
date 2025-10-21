@@ -14,12 +14,12 @@ function oralHealth() {
   // D: School Email (index 3)
   // Oral Health headers:
   // A: StudyID (index 0)
-  // F: Email (index 5: "[School Email Address]")
+  // F: Name/Email (index 5: "[Full Name], [School Email Address]")
 
-  const EMAIL_COL_MASTER = 3; // Column D (0-based)
-  const STUDYID_COL_MASTER = 0; // Column A (0-based)
-  const NAME_EMAIL_COL_ORAL = 5; // Column F (0-based)
-  const STUDYID_COL_ORAL = 0; // Column A (0-based)
+  const STUDYID_COL_MASTER = 0;
+  const EMAIL_COL_MASTER   = 3;
+  const STUDYID_COL_ORAL   = 0;
+  const NAMEEMAIL_COL_ORAL = 5;
 
   const sheetsInfo = {
     1: {sheet: masterSpreadsheet.getSheetByName('W1'), oralColumn: 15, healthCompletedIdx: 12},
@@ -28,6 +28,15 @@ function oralHealth() {
     4: {sheet: masterSpreadsheet.getSheetByName('W4'), oralColumn: 13, healthCompletedIdx: 10},
     5: {sheet: masterSpreadsheet.getSheetByName('W5'), oralColumn: 13, healthCompletedIdx: 10}
   };
+
+  // Helper: parse "[Full Name], email@school.edu" -> "email@school.edu"
+  function extractEmail(nameEmailCell) {
+    if (!nameEmailCell) return '';
+    const parts = String(nameEmailCell).split(',');
+    if (parts.length < 2) return '';
+    const email = parts[1].trim();
+    return email && email.indexOf('@') > 0 ? email.toLowerCase() : '';
+  }
 
   // Preload data and create maps for efficient lookup (by StudyID and by Email)
   const masterDataMaps = {};
@@ -42,26 +51,21 @@ function oralHealth() {
 
     for (let i = 1; i < data.length; i++) { // skip header
       const row = data[i];
-      const studyIdRaw = row[STUDYID_COL_MASTER];
-      const emailRaw = row[EMAIL_COL_MASTER];
-
-      const studyId = studyIdRaw !== null && studyIdRaw !== undefined ? String(studyIdRaw).trim() : '';
-      const email = emailRaw ? String(emailRaw).trim().toLowerCase() : '';
-
+      const studyId = row[STUDYID_COL_MASTER] != null ? String(row[STUDYID_COL_MASTER]).trim() : '';
+      const email = row[EMAIL_COL_MASTER] ? String(row[EMAIL_COL_MASTER]).trim().toLowerCase() : '';
       const rec = {row: i, data: row, backgrounds: backgrounds[i]};
       if (studyId) mapByStudyId[studyId] = rec;
-      if (email) mapByEmail[email] = rec;
+      if (email)   mapByEmail[email] = rec;
     }
 
     masterDataMaps[waveKey] = {sheet, data, backgrounds, mapByStudyId, mapByEmail};
   });
 
-  // Update Oral Health Data
-  // Oral health rows: need wave in column B (index 1) as in your original
+  // Update Oral Health Data (YES when matched)
   for (let r = 1; r < oralHealthData.length; r++) {
     const row = oralHealthData[r];
     const oralStudyId = row[STUDYID_COL_ORAL] != null ? String(row[STUDYID_COL_ORAL]).trim() : '';
-    const wave = row[1]; // assumes Wave number in col B as in your code
+    const wave = row[1]; // assumes wave number is in column B
     const sheetInfo = sheetsInfo[wave];
     if (!sheetInfo) continue;
 
@@ -71,16 +75,16 @@ function oralHealth() {
 
     let participant = null;
 
-    // 1) Try StudyID
+    // 1) Try StudyID match
     if (oralStudyId) {
-      participant = masterSheetData.mapByStudyId[oralStudyId];
+      participant = masterSheetData.mapByStudyId[oralStudyId] || null;
     }
 
-    // 2) Fallback by Email (parsed from Oral Health "Name/Email" col F)
+    // 2) Fallback to email match (from Oral Health F)
     if (!participant) {
-      const emailFromOral = row[NAME_EMAIL_COL_ORAL];
-      if (emailFromOral) {
-        participant = masterSheetData.mapByEmail[emailFromOral] || null;
+      const email = extractEmail(row[NAMEEMAIL_COL_ORAL]);
+      if (email) {
+        participant = masterSheetData.mapByEmail[email] || null;
       }
     }
 
@@ -93,7 +97,7 @@ function oralHealth() {
     }
   }
 
-  // Default all empty or non-YES cells to NO (only if Health Completed = YES)
+  // Default all empty or non-YES cells to NO, but only if Health Completed = YES
   Object.entries(masterDataMaps).forEach(([waveKey, {data, backgrounds}]) => {
     const {oralColumn, healthCompletedIdx} = sheetsInfo[waveKey];
     for (let i = 1; i < data.length; i++) {
@@ -101,11 +105,9 @@ function oralHealth() {
       if (!completed) continue;
 
       const val = String(data[i][oralColumn] || '').toUpperCase();
-      if (val !== 'YES') {
-        if (val !== 'NO') {
-          data[i][oralColumn] = 'NO';
-          backgrounds[i][oralColumn] = 'red';
-        }
+      if (val !== 'YES' && val !== 'NO') {
+        data[i][oralColumn] = 'NO';
+        backgrounds[i][oralColumn] = 'red';
       }
     }
   });

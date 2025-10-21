@@ -27,7 +27,6 @@ function transferWave2SurveyData() {
   var healthCompletedIdx          = 10;
   var preferredContactMethodIdx   = 17;
   var notesIdx                    = 18;
-  var enrolledInSubStudyIdx       = 14;
   for (var j = 1; j < masterData.length; j++) {
     var mRow = masterData[j],
         studyId = mRow[0];
@@ -66,10 +65,6 @@ function transferWave2SurveyData() {
         //By Default, the "Health Visit Scheduled" column is set to value "NO" IF AND ONLY IF (IFF) the "Survey Completed" column is set to "YES"
         mRow[healthScheduledIdx] = "NO"; 
         masterBg[j][healthScheduledIdx] = "red"; 
-
-        //By Default, the "Interested in Substudy" column is set to value "NO" IF AND ONLY IF (IFF) the "Survey Completed" column is set to "YES"
-        //mRow[enrolledInSubStudyIdx] = "NO"; 
-        //masterBg[j][enrolledInSubStudyIdx] = "red"; 
       }
 
       //HEALTH VISIT DATE

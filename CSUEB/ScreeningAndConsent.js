@@ -6,11 +6,11 @@ function transferDataToMasterSheet() {
   // Define configuration for each master sheet.
   // Note: updateMap maps field names to the 1-indexed column to update.
   var sheetConfigs = {
-    "W1": { notesCol: 20, updateMap: { firstName:2, lastName:3, ucrEmail:4, personalEmail:5, phone:6, classStatus:7, source:8 } },
-    "W2": { notesCol: 18, updateMap: { firstName:2, lastName:3, ucrEmail:4, personalEmail:5, phone:6 } },
-    "W3": { notesCol: 19, updateMap: { firstName:2, lastName:3, ucrEmail:4, personalEmail:5, phone:6 } },
-    "W4": { notesCol: 20, updateMap: { firstName:2, lastName:3, ucrEmail:4, personalEmail:5, phone:6 } },
-    "W5": { notesCol: 21, updateMap: { firstName:2, lastName:3, ucrEmail:4, personalEmail:5, phone:6 } }
+    "W1": { notesCol: 20, updateMap: { firstName:2, lastName:3, csuebEmail:4, personalEmail:5, phone:6, classStatus:7, source:8 } },
+    "W2": { notesCol: 19, updateMap: { firstName:2, lastName:3, csuebEmail:4, personalEmail:5, phone:6 } },
+    "W3": { notesCol: 19, updateMap: { firstName:2, lastName:3, csuebEmail:4, personalEmail:5, phone:6 } },
+    "W4": { notesCol: 20, updateMap: { firstName:2, lastName:3, csuebEmail:4, personalEmail:5, phone:6 } },
+    "W5": { notesCol: 21, updateMap: { firstName:2, lastName:3, csuebEmail:4, personalEmail:5, phone:6 } }
   };
 
   // Open the master spreadsheet and load each sheet’s data and backgrounds into memory.
@@ -43,9 +43,9 @@ function transferDataToMasterSheet() {
   // Data sources (you may leave these as-is)
   var sources = [
     { fileId: scriptProperties.getProperty("ScreeningAndConsent-Email-KEY"), 
-      sheetName: 'Email', 
-      source: 'EMAIL' },
-    { fileId: scriptProperties.getProperty("ScreeningAndConsent-IGWEB-KEY"),  
+      sheetName: 'Sheet1', 
+        source: 'EMAIL' },
+    { fileId: scriptProperties.getProperty("ScreeningAndConsent-IGWEB-KEY"), 
       sheetName: 'Sheet1', 
       source: 'IG/WEB' },
     { fileId: scriptProperties.getProperty("ScreeningAndConsent-REFERRAL-KEY"), 
@@ -69,7 +69,7 @@ function transferDataToMasterSheet() {
       var studyId = row[0];
       var firstName = row[1];
       var lastName = row[2];
-      var ucrEmail = row[3];
+      var csuebEmail = row[3];
       var personalEmail = row[4];
       var phone = formatPhoneNumber(row[5]);
       var classStatus = mapClassStatus(row[6]);
@@ -83,7 +83,7 @@ function transferDataToMasterSheet() {
       updateMasterRow(masterSheets["W1"], studyId, {
         firstName: firstName,
         lastName: lastName,
-        ucrEmail: ucrEmail,
+        csuebEmail: csuebEmail,
         personalEmail: personalEmail,
         phone: phone,
         classStatus: classStatus,
@@ -93,7 +93,7 @@ function transferDataToMasterSheet() {
       updateMasterRow(masterSheets["W2"], studyId, {
         firstName: firstName,
         lastName: lastName,
-        ucrEmail: ucrEmail,
+        csuebEmail: csuebEmail,
         personalEmail: personalEmail,
         phone: phone
       }, referralNote);
@@ -101,7 +101,7 @@ function transferDataToMasterSheet() {
       updateMasterRow(masterSheets["W3"], studyId, {
         firstName: firstName,
         lastName: lastName,
-        ucrEmail: ucrEmail,
+        csuebEmail: csuebEmail,
         personalEmail: personalEmail,
         phone: phone
       }, referralNote);
@@ -109,7 +109,7 @@ function transferDataToMasterSheet() {
       updateMasterRow(masterSheets["W4"], studyId, {
         firstName: firstName,
         lastName: lastName,
-        ucrEmail: ucrEmail,
+        csuebEmail: csuebEmail,
         personalEmail: personalEmail,
         phone: phone
       }, referralNote);
@@ -117,7 +117,7 @@ function transferDataToMasterSheet() {
       updateMasterRow(masterSheets["W5"], studyId, {
         firstName: firstName,
         lastName: lastName,
-        ucrEmail: ucrEmail,
+        csuebEmail: csuebEmail,
         personalEmail: personalEmail,
         phone: phone
       }, referralNote);
