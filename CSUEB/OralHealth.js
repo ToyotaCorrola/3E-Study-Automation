@@ -19,7 +19,7 @@ function oralHealth() {
   const STUDYID_COL_MASTER = 0;
   const EMAIL_COL_MASTER   = 3;
   const STUDYID_COL_ORAL   = 0;
-  const NAMEEMAIL_COL_ORAL = 5;
+  const NAME_EMAIL_COL_ORAL = 5;
 
   const sheetsInfo = {
     1: {sheet: masterSpreadsheet.getSheetByName('W1'), oralColumn: 15, healthCompletedIdx: 12},
