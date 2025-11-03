@@ -20,64 +20,101 @@ function transferWave1SurveyData() {
   var schoolEmailMap = {};
   var personalEmailMap = {};
   var duplicateStudyIds = [];
+  var notesIdx = 20; 
+
+
 
   for (var j = 1; j < masterData.length; j++) {
     var mRow = masterData[j];
     var studyId = mRow[0];
-    var schoolEmail = mRow[3]; 
-    var personalEmail = mRow[4]; 
+    var schoolEmail = mRow[3];   // Column D (index 3)
+    var personalEmail = mRow[4]; // Column E (index 4)
     
     // Check School Email duplicates
     if (studyId && schoolEmail && schoolEmail.toString().trim() !== "") {
       var emailLower = schoolEmail.toString().toLowerCase().trim();
       
       if (schoolEmailMap[emailLower]) {
-        // Found a duplicate! This is NOT the first occurrence
-        // var firstStudyId = schoolEmailMap[emailLower].studyId;
-        // var firstRowNum = schoolEmailMap[emailLower].row;
-
+        // Found a duplicate - this is the NEWER one, keep this
+        var previousDuplicates = schoolEmailMap[emailLower].allOldIds || [];
+        var allOldIds = previousDuplicates.concat([schoolEmailMap[emailLower].studyId]);
+        var oldRow = schoolEmailMap[emailLower].row - 1; // Convert to 0-indexed
+        var oldStudyId = schoolEmailMap[emailLower].studyId;
         
-        // Mark ONLY this duplicate YELLOW (not the first one)
-        masterBg[j][0] = "yellow";  // Changed to yellow
-        duplicateStudyIds.push(studyId);
-        //Logger.log("MARKED ROW " + (j + 1) + " YELLOW - StudyID: " + studyId);
-      } else {
-        // First time seeing this email - store it
+        
+        // Mark the most recent OLD row yellow and update its Study ID
+        masterBg[oldRow][0] = "yellow";
+        appendToNotes(masterData[oldRow], notesIdx, "Old Study ID: " + oldStudyId + " (replaced by " + studyId + " due to duplicate email)");
+        masterData[oldRow][0] = studyId; // Replace old Study ID with new one
+        
+        // Add note to the NEW/CURRENT row about ALL old duplicates
+        appendToNotes(mRow, notesIdx, "Previous duplicate Study IDs: " + allOldIds.join(", "));
+        
+        duplicateStudyIds.push(oldStudyId);
+        
+        // Update the map to track this new one as the latest, along with all previous old IDs
         schoolEmailMap[emailLower] = {
           studyId: studyId,
-          row: j + 1
+          row: j + 1,
+          allOldIds: allOldIds  // Keep track of all previous duplicates
+        };
+        
+      } else {
+        schoolEmailMap[emailLower] = {
+          studyId: studyId,
+          row: j + 1,
+          allOldIds: []  // No previous duplicates yet
         };
       }
     }
-
+    
     // Check Personal Email duplicates
     if (studyId && personalEmail && personalEmail.toString().trim() !== "") {
       var emailLower = personalEmail.toString().toLowerCase().trim();
       
       if (personalEmailMap[emailLower]) {
-        // var firstStudyId = personalEmailMap[emailLower].studyId;
-        var firstRowNum = personalEmailMap[emailLower].row;
-        // 
+        // Found a duplicate - this is the NEWER one, keep this
+        var previousDuplicates = personalEmailMap[emailLower].allOldIds || [];
+        var allOldIds = previousDuplicates.concat([personalEmailMap[emailLower].studyId]);
+        var oldRow = personalEmailMap[emailLower].row - 1; // Convert to 0-indexed
+        var oldStudyId = personalEmailMap[emailLower].studyId;
         
-        masterBg[j][0] = "yellow";
-        if (duplicateStudyIds.indexOf(studyId) === -1) {
-          duplicateStudyIds.push(studyId);
+        
+        // Mark the most recent OLD row yellow and update its Study ID
+        masterBg[oldRow][0] = "yellow";
+        appendToNotes(masterData[oldRow], notesIdx, "Old Study ID: " + oldStudyId + " (replaced by " + studyId + " due to duplicate email)");
+        masterData[oldRow][0] = studyId; // Replace old Study ID with new one
+        
+        // Add note to the NEW/CURRENT row about ALL old duplicates
+        appendToNotes(mRow, notesIdx, "Previous duplicate Study IDs: " + allOldIds.join(", "));
+        
+        if (duplicateStudyIds.indexOf(oldStudyId) === -1) {
+          duplicateStudyIds.push(oldStudyId);
         }
+        
+        // Update the map to track this new one as the latest, along with all previous old IDs
+        personalEmailMap[emailLower] = {
+          studyId: studyId,
+          row: j + 1,
+          allOldIds: allOldIds  // Keep track of all previous duplicates
+        };
+        
       } else {
         personalEmailMap[emailLower] = {
           studyId: studyId,
-          row: j + 1
+          row: j + 1,
+          allOldIds: []  // No previous duplicates yet
         };
       }
     }
   }
 
-  // Logger.log("\nSUMMARY:");
-  // Logger.log("Total unique UCR emails: " + Object.keys(schoolEmailMap).length);
-  // Logger.log("Total unique personal emails: " + Object.keys(personalEmailMap).length);
-  // Logger.log("Study IDs marked as duplicates: " + duplicateStudyIds.join(", "));
-  // Logger.log("Total duplicates marked: " + duplicateStudyIds.length);
-    
+  Logger.log("\nSUMMARY:");
+  Logger.log("Total unique school emails: " + Object.keys(schoolEmailMap).length);
+  Logger.log("Total unique personal emails: " + Object.keys(personalEmailMap).length);
+  Logger.log("Old Study IDs replaced: " + duplicateStudyIds.join(", "));
+  Logger.log("Total duplicates found: " + duplicateStudyIds.length);
+
   // Build destination map keyed by Study ID from column A.
   var destMap = {};
   for (var i = 1; i < destData.length; i++) {
@@ -188,4 +225,47 @@ function appendToNotes(row, index, note) {
 function formatPhoneNumber(phone) {
   phone = phone.toString();
   return phone.startsWith("1") ? phone : "1" + phone;
+}
+
+function cleanupNotes() {
+  var masterSheetId = '1rLIUGPVviSjAP9P9PwvjDVWyEwfyUxkH3kgN0sn7xkI';
+  var w1SheetName = 'W1';
+  var notesIdx = 20; // Column U (index 20)
+  
+  var masterSS = SpreadsheetApp.openById(masterSheetId);
+  var w1Sheet = masterSS.getSheetByName(w1SheetName);
+  
+  var masterRange = w1Sheet.getDataRange();
+  var masterData = masterRange.getValues();
+  
+  for (var j = 1; j < masterData.length; j++) {
+    var mRow = masterData[j];
+    var notes = mRow[notesIdx];
+    
+    if (notes && notes.toString().trim() !== "") {
+      var notesStr = notes.toString();
+      
+      // Find the first occurrence of either phrase
+      var prevDupIndex = notesStr.indexOf("Previous duplicate");
+      var oldIdIndex = notesStr.indexOf("Old Study ID:");
+      
+      // Find which one comes first (or if neither exists)
+      var cutoffIndex = -1;
+      if (prevDupIndex !== -1 && oldIdIndex !== -1) {
+        cutoffIndex = Math.min(prevDupIndex, oldIdIndex);
+      } else if (prevDupIndex !== -1) {
+        cutoffIndex = prevDupIndex;
+      } else if (oldIdIndex !== -1) {
+        cutoffIndex = oldIdIndex;
+      }
+      
+      // If we found one of the phrases, cut everything from that point
+      if (cutoffIndex !== -1) {
+        mRow[notesIdx] = notesStr.substring(0, cutoffIndex).trim();
+      }
+    }
+  }
+  
+  w1Sheet.getRange(1, 1, masterData.length, masterData[0].length).setValues(masterData);
+  Logger.log("Notes cleaned up successfully! Removed 'Previous duplicate:' and 'Old Study ID:' and everything after.");
 }
