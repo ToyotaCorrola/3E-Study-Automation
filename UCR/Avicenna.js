@@ -1,4 +1,3 @@
-//Change Example
 function updateSubstudyEnrollment() {
   let scriptProperties = PropertiesService.getScriptProperties();
   // Master Sheet and Linking Destination details.
