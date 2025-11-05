@@ -16,7 +16,7 @@ function transferWave1SurveyData() {
   var masterBg = masterRange.getBackgrounds();
   var destData = destSheet.getDataRange().getValues();
   
-
+/*
   var schoolEmailMap = {};
   var personalEmailMap = {};
   var duplicateStudyIds = [];
@@ -77,7 +77,7 @@ function transferWave1SurveyData() {
   // Logger.log("Total unique personal emails: " + Object.keys(personalEmailMap).length);
   // Logger.log("Study IDs marked as duplicates: " + duplicateStudyIds.join(", "));
   // Logger.log("Total duplicates marked: " + duplicateStudyIds.length);
-    
+    */
   // Build destination map keyed by Study ID from column A.
   var destMap = {};
   for (var i = 1; i < destData.length; i++) {
