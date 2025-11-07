@@ -53,7 +53,10 @@ function transferDataToMasterSheet() {
       source: 'REFERRAL' },
     { fileId: scriptProperties.getProperty("ScreeningAndConsent-FLYER-KEY"), 
       sheetName: 'Sheet1', 
-      source: 'FLYER' }
+      source: 'FLYER' },
+    { fileId: scriptProperties.getProperty("ScreeningAndConsent-SONA"), 
+      sheetName: 'Sheet1', 
+      source: 'SONA' }
   ];
   
   // Process each source file

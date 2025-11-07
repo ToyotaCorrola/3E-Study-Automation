@@ -46,7 +46,9 @@ function transferHealthVisitData(){
         firstName  = row[1],
         visitDate  = new Date(row[2]),
         waveStr    = row[3] != null ? row[3].toString().toLowerCase() : '',
-        nameEmail  = row[4];
+        nameEmail  = row[4].trim().toLowerCase();
+        
+    if (isNaN(visitDate)) continue; // skip invalid dates
 
     var visitMonth = visitDate.getMonth() + 1;
     var visitYear  = visitDate.getFullYear();

@@ -16,10 +16,10 @@ function oralHealth() {
   // A: StudyID (index 0)
   // F: Email (index 5: "[School Email Address]")
 
-  const EMAIL_COL_MASTER = 3; // Column D (0-based)
-  const STUDYID_COL_MASTER = 0; // Column A (0-based)
-  const NAME_EMAIL_COL_ORAL = 5; // Column F (0-based)
-  const STUDYID_COL_ORAL = 0; // Column A (0-based)
+  const EMAIL_COL_MASTER = 3; 
+  const STUDYID_COL_MASTER = 0; 
+  const NAME_EMAIL_COL_ORAL = 5;
+  const STUDYID_COL_ORAL = 0;
 
   const sheetsInfo = {
     1: {sheet: masterSpreadsheet.getSheetByName('W1'), oralColumn: 15, healthCompletedIdx: 12},
