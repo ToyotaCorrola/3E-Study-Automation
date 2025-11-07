@@ -73,7 +73,7 @@ function transferHealthVisitData(){
     if (studyId.length === 0) {
       if (nameEmail) {
         idx = master.mapByEmail[nameEmail];
-        console.log(master.data[idx] + " " + visitMonth + " " + visitYear);
+        //console.log(master.data[idx] + " " + visitMonth + " " + visitYear);
       }
     }
     if (idx === undefined) 
