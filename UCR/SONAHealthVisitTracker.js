@@ -93,6 +93,9 @@ function SONA_HEALTH_VISIT_TRACKER() {
       }
     }
   }
+
+
+  removeSonaTrackerByStudyID(SONA_TRACKER_DEST, SONA_TRACKER_DEST_SHEET);
 }
 
 function createLinkingKeyMap(
@@ -149,4 +152,73 @@ function getLinkingKeySources(
   }
 
   return byStudyId;
+}
+
+function removeSonaTrackerByStudyID(SPREADSHEET_ID, SHEET_ID) {
+  const CASE_INSENSITIVE = true;       // set false to make the match case-sensitive
+  const TREAT_BLANKS_AS_KEYS = false;  // true => only the first blank key is kept
+
+  if (!SHEET_ID) throw new Error('Sheet "W1" not found.');
+
+  const values = SHEET_ID.getDataRange().getValues(); // includes header
+  if (values.length <= 1) {
+    Logger.log('No data rows.');
+    return;
+  }
+
+  const seen = new Set();
+  const rowsToDelete = [];
+  const removedRows = []; // [{row: <1-based>, rawKey: <cell value>, normKey: <normalized>}]
+
+  // Scan rows, collect dupes
+  for (let i = 1; i < values.length; i++) { // skip header at 0
+    const rawCell = values[i][0]; // column A
+    let key = rawCell == null ? '' : String(rawCell).trim();
+
+    if (CASE_INSENSITIVE) key = key.toLowerCase();
+    if (!key && !TREAT_BLANKS_AS_KEYS) {
+      // ignoring blank keys entirely
+      continue;
+    }
+
+    if (seen.has(key)) {
+      rowsToDelete.push(i + 1); // convert to sheet row
+      removedRows.push({ row: i + 1, rawKey: rawCell, normKey: key });
+    } else {
+      seen.add(key);
+    }
+  }
+
+  if (rowsToDelete.length === 0) {
+    Logger.log('No duplicates found.');
+    return;
+  }
+
+  // ---- Print all removed values from column A ----
+  Logger.log('Removed duplicate rows (column A values):');
+  removedRows.forEach(r => Logger.log(`Row ${r.row}: ${r.rawKey}`));
+
+  // ---- Delete duplicates (bottom-up or in batches) ----
+  // Group contiguous rows to reduce calls
+  rowsToDelete.sort((a, b) => a - b);
+  const groups = [];
+  let start = rowsToDelete[0], count = 1;
+  for (let i = 1; i < rowsToDelete.length; i++) {
+    const r = rowsToDelete[i];
+    if (r === start + count) {
+      count++;
+    } else {
+      groups.push([start, count]);
+      start = r; count = 1;
+    }
+  }
+  groups.push([start, count]);
+
+  // Delete from bottom group to top to avoid shifting earlier groups
+  for (let i = groups.length - 1; i >= 0; i--) {
+    const [rowStart, howMany] = groups[i];
+    SHEET_ID.deleteRows(rowStart, howMany);
+  }
+
+  Logger.log(`Deleted ${rowsToDelete.length} duplicate row(s).`);
 }
